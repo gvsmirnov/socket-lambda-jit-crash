@@ -1,0 +1,32 @@
+apply plugin: 'java'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+wrapper {
+  gradleVersion '2.2.1'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile "io.netty:netty-handler:4.0.24.Final"
+}
+
+task agentJar(type: Jar, dependsOn: ['jar']) {
+    archiveName = 'agent.jar'
+
+
+    manifest {
+        attributes("Premain-Class": "com.example.Agent", "Main-Class": "com.example.Main")
+    }
+
+    from {
+        configurations.compile.collect {
+            zipTree(it).matching { exclude 'META-INF/**' }
+        }
+    }
+
+    from zipTree(jar.archivePath)
+}
